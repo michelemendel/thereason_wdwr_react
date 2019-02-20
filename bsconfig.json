@@ -1,8 +1,5 @@
 {
     "name": "react-template",
-    "reason": {
-        "react-jsx": 2
-    },
     "sources": {
         "dir": "src",
         "subdirs": true
@@ -15,8 +12,11 @@
     ],
     "suffix": ".bs.js",
     "namespace": true,
+    "refmt": 3,
+    "reason": {
+        "react-jsx": 2
+    },
     "bs-dependencies": [
         "reason-react"
-    ],
-    "refmt": 3
+    ]
 }
