@@ -3,12 +3,13 @@
     "version": "0.1.0",
     "scripts": {
         "build": "bsb -make-world",
-        "start": "bsb -make-world -w",
+        "build:watch": "bsb -make-world -w",
         "clean": "bsb -clean-world",
         "test": "echo \"Error: no test specified\" && exit 1",
         "webpack": "webpack -w",
         "webpack:production": "NODE_ENV=production webpack",
-        "server": "webpack-dev-server"
+        "server": "webpack-dev-server",
+        "start": "npm-run-all --parallel build:watch webpack server"
     },
     "keywords": [
         "Reason",
@@ -27,7 +28,10 @@
         "reason-react": ">=0.4.0"
     },
     "devDependencies": {
+        "@glennsl/bs-json": "^3.0.0",
+        "bs-fetch": "^0.3.1",
         "bs-platform": "^4.0.18",
+        "file-loader": "^3.0.1",
         "html-webpack-plugin": "^3.2.0",
         "npm-run-all": "^4.1.5",
         "webpack": "^4.0.1",

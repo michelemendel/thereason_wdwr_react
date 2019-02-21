@@ -1,15 +1,13 @@
 {
     "name": "react-template",
     "sources": {
-        "dir": "src",
+        "dir": "apps/notices",
         "subdirs": true
     },
-    "package-specs": [
-        {
-            "module": "commonjs",
-            "in-source": true
-        }
-    ],
+    "package-specs": [{
+        "module": "commonjs",
+        "in-source": true
+    }],
     "suffix": ".bs.js",
     "namespace": true,
     "refmt": 3,
@@ -17,6 +15,8 @@
         "react-jsx": 2
     },
     "bs-dependencies": [
+        "@glennsl/bs-json",
+        "bs-fetch",
         "reason-react"
     ]
 }

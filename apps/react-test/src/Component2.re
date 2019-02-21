@@ -11,7 +11,7 @@ type action =
 
 /* Component template declaration.
    Needs to be **after** state and action declarations! */
-let component = ReasonReact.reducerComponent("Example");
+let component = ReasonReact.reducerComponent("Component2");
 
 /* greeting and children are props. `children` isn't used, therefore ignored.
    We ignore it by prepending it with an underscore */
@@ -25,7 +25,7 @@ let make = (~greeting, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | Click => ReasonReact.Update({...state, count: state.count + 1})
-    | Toggle => ReasonReact.Update({...state, show: ! state.show})
+    | Toggle => ReasonReact.Update({...state, show: !state.show})
     },
 
   render: self => {

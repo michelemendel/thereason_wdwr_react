@@ -4,8 +4,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const outputDir = path.join(__dirname, 'build/');
 const isProd = process.env.NODE_ENV === 'production';
 
+// const app = "react-test";
+const app = "notices";
+
 module.exports = {
-    entry: './src/Index.bs.js',
+    entry: "./apps/" + app + "/src/Index.bs.js",
     mode: isProd ? 'production' : 'development',
     output: {
         path: outputDir,
@@ -13,10 +16,21 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'src/index.html',
+            template: path.join("apps", app, "src/index.html"),
             inject: false
         })
     ],
+    module: {
+        rules: [{
+            test: /\.(png|jpg|svg)$/,
+            use: [{
+                loader: "file-loader",
+                options: {
+                    name: 'icons/[name].[ext]'
+                }
+            }]
+        }]
+    },
     devServer: {
         compress: true,
         contentBase: outputDir,
