@@ -1,4 +1,4 @@
-[@bs.val] external require: string => string = "";
+let require = Interop.require;
 
 require("../icons/warning.svg");
 require("../icons/error.svg");

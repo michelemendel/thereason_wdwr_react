@@ -7,6 +7,7 @@ type state = {
 /* Action declaration */
 type action =
   | Click
+  | Set(int)
   | Toggle;
 
 /* Component template declaration.
@@ -22,23 +23,28 @@ let make = (~greeting, _children) => {
   initialState: () => {count: 0, show: true},
 
   /* State transitions */
-  reducer: (action, state) =>
+  reducer: (action, state) => {
+    Js.log2("REDUCER:action", action);
+    Js.log2("REDUCER:state", state);
+
     switch (action) {
     | Click => ReasonReact.Update({...state, count: state.count + 1})
+    | Set(n) => ReasonReact.Update({...state, count: n})
     | Toggle => ReasonReact.Update({...state, show: !state.show})
-    },
+    };
+  },
 
   render: self => {
-    let message =
-      "You've clicked this " ++ string_of_int(self.state.count) ++ " times(s)";
-    <div>
-      <button onClick={_event => self.send(Click)}>
-        {ReasonReact.string(message)}
-      </button>
-      <button onClick={_event => self.send(Toggle)}>
-        {ReasonReact.string("Toggle greeting")}
-      </button>
-      {self.state.show ? ReasonReact.string(greeting) : ReasonReact.null}
-    </div>;
+    Js.log2("RENDER:self", self);
+
+    let message = "You've clicked this " ++ string_of_int(self.state.count) ++ " times(s)";
+    <>
+      <div> <button onClick={_event => self.send(Click)}> {ReasonReact.string(message)} </button> </div>
+      <div> <button onClick={_event => self.send(Set(0))}> {ReasonReact.string("Reset")} </button> </div>
+      <div>
+        <button onClick={_event => self.send(Toggle)}> {ReasonReact.string("Toggle greeting")} </button>
+      </div>
+      <div> {self.state.show ? ReasonReact.string(greeting) : ReasonReact.null} </div>
+    </>;
   },
 };

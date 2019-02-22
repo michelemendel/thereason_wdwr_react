@@ -1,6 +1,6 @@
 /* This is the basic component. */
-/*let component = ReasonReact.statelessComponent("ComponentX1");*/
-let component = ReasonReact.statelessComponent(__MODULE__);
+let component = ReasonReact.statelessComponent("Component1");
+/* let component = ReasonReact.statelessComponent(__MODULE__); */
 
 /* Your familiar handleClick from ReactJS. This mandatorily takes the payload,
    then the `self` record, which contains state (none here), `handle`, `reduce`
@@ -18,7 +18,7 @@ let handleClick = (_event, _self) => Js.log("clicked!");
 
 let x =
   List.map(
-    it => <div> {ReasonReact.string(string_of_int(it))} </div>,
+    it => <div key={string_of_int(it)}> {ReasonReact.string(string_of_int(it))} </div>,
     [1, 2, 3],
   );
 Js.log(x);
