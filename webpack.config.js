@@ -6,7 +6,8 @@ const isProd = process.env.NODE_ENV === 'production';
 
 // const app = "react-test";
 // const app = "notices";
-const app = "shirt-react";
+// const app = "shirt-react";
+const app = "shirt-storage";
 
 module.exports = {
     entry: "./apps/" + app + "/src/Index.bs.js",

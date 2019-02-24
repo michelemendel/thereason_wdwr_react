@@ -1,15 +1,13 @@
 {
     "name": "react-template",
     "sources": {
-        "dir": "apps/shirt-react",
+        "dir": "apps/shirt-storage",
         "subdirs": true
     },
-    "package-specs": [
-        {
-            "module": "commonjs",
-            "in-source": true
-        }
-    ],
+    "package-specs": [{
+        "module": "commonjs",
+        "in-source": true
+    }],
     "suffix": ".bs.js",
     "namespace": true,
     "refmt": 3,

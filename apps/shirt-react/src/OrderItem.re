@@ -1,22 +1,25 @@
-module RR = ReasonReact; 
-  
+open Utils;
+
 let component = RR.statelessComponent("OrderItem");
 
-let make = (~order: Shirt.Order.t, ~deleteFunction: (ReactEvent.Mouse.t) => unit, _children) => {
+let make =
+    (
+      ~order: Shirt.Order.t,
+      ~deleteFunction: ReactEvent.Mouse.t => unit,
+      _children,
+    ) => {
   ...component,
-      
-  render: (_self) => { 
-    <tr>
-      <td>{RR.string(string_of_int(order.quantity))}</td>
-      <td>{RR.string(Shirt.Size.toString(order.size))}</td>
-      <td>{RR.string(Shirt.Sleeve.toString(order.sleeve))}</td>
-      <td>{RR.string(Shirt.Color.toString(order.color))}</td>
-      <td>{RR.string(Shirt.Pattern.toString(order.pattern))}</td>
-      <td>
-        <button onClick={deleteFunction}>{RR.string("Delete")}</button> 
-      </td>
-      
-    </tr>
-  }
-};
 
+  render: _self => {
+    <tr>
+      <td> {rrStringOfInt(order.quantity)} </td>
+      <td> {Shirt.Size.toRRString(order.size)} </td>
+      <td> {rrString(Shirt.Sleeve.toString(order.sleeve))} </td>
+      <td> {rrString(Shirt.Color.toString(order.color))} </td>
+      <td> {rrString(Shirt.Pattern.toString(order.pattern))} </td>
+      <td>
+        <button onClick=deleteFunction> {rrString("Delete")} </button>
+      </td>
+    </tr>;
+  },
+};

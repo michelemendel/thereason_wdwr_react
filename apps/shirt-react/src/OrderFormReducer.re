@@ -1,25 +1,31 @@
+open Utils;
+open Belt;
+
 let reducer = (action, state: OrderFormState.state) =>
   switch (action) {
   | OrderFormState.Enter(order) =>
-    let n = OrderFormUtils.toIntWithDefault(state.qtyStr, 0);
+    let n = toIntWithDefault(state.qtyStr, 0);
     if (n > 0 && n <= 100) {
-      ReasonReact.Update({
+      rrUpdate({
         ...state,
         orders: Belt.Array.concat(state.orders, [|order|]),
         nextOrderNumber: state.nextOrderNumber + 1,
         errorText: "",
       });
     } else {
-      ReasonReact.Update({...state, errorText: "Quantity must be between 1 and 100."});
+      rrUpdate({...state, errorText: "Quantity must be between 1 and 100."});
     };
-  | ChangeQty(newQty) => ReasonReact.Update({...state, qtyStr: newQty})
-  | ChangeSize(newSize) => ReasonReact.Update({...state, sizeStr: newSize})
-  | ChangeSleeve(newSleeve) => ReasonReact.Update({...state, sleeveStr: newSleeve})
-  | ChangeColor(newColor) => ReasonReact.Update({...state, colorStr: newColor})
-  | ChangePattern(newPattern) => ReasonReact.Update({...state, patternStr: newPattern})
+  | ChangeQty(newQty) => rrUpdate({...state, qtyStr: newQty})
+  | ChangeSize(newSize) => rrUpdate({...state, sizeStr: newSize})
+  | ChangeSleeve(newSleeve) => rrUpdate({...state, sleeveStr: newSleeve})
+  | ChangeColor(newColor) => rrUpdate({...state, colorStr: newColor})
+  | ChangePattern(newPattern) => rrUpdate({...state, patternStr: newPattern})
   | Delete(order) =>
-    ReasonReact.Update({
+    rrUpdate({
       ...state,
-      orders: Belt.Array.keep(state.orders, item => item.orderNumber != order.orderNumber),
+      orders:
+        Array.keep(state.orders, item =>
+          item.orderNumber != order.orderNumber
+        ),
     })
   };

@@ -1,5 +1,3 @@
-open Utils;
-
 module Size = {
   type t =
     | XSmall(int)
@@ -17,8 +15,6 @@ module Size = {
     | XLarge(n) => String.make(n, 'X') ++ "L"
     };
 
-  let toRRString = (size: t) => rrString(toString(size));
-
   let fromString = (str: string): option(t) =>
     switch (Js.String.toUpperCase(str)) {
     | "S" => Some(Small)
@@ -29,6 +25,13 @@ module Size = {
     | s when Js.Re.test(s, [%re "/^X+L$/"]) =>
       Some(XLarge(String.length(s) - 1))
     | _ => None
+    };
+  exception InvalidSize;
+
+  let decodeJson = (str: string): t =>
+    switch (fromString(str)) {
+      | Some(size) => size
+      | None => raise(InvalidSize)
     };
 };
 
@@ -51,11 +54,19 @@ module Sleeve = {
     | "short sleeve" => Some(Short)
     | "long"
     | "long sleeve" => Some(Long)
-    | "extra-long"
+    | "extra"
     | "extra-long sleeve"
     | "xlong"
     | "xlong sleeve" => Some(XLong)
     | _ => None
+    };
+    
+  exception InvalidSleeve;
+
+  let decodeJson = (str: string): t =>
+    switch (fromString(str)) {
+      | Some(sleeve) => sleeve
+      | None => raise(InvalidSleeve)
     };
 };
 
@@ -85,6 +96,14 @@ module Color = {
     | "brown" => Some(Brown)
     | _ => None
     };
+
+  exception InvalidColor;
+  
+  let decodeJson = (str: string): t =>
+    switch (fromString(str)) {
+      | Some(color) => color
+      | None => raise(InvalidColor)
+    };
 };
 
 module Pattern = {
@@ -108,7 +127,18 @@ module Pattern = {
     | "checked" => Some(Check)
     | _ => None
     };
+
+  exception InvalidPattern;
+  
+  let decodeJson = (str: string): t =>
+    switch (fromString(str)) {
+      | Some(pattern) => pattern
+      | None => raise(InvalidPattern)
+    };
 };
+
+module E = Json.Encode;
+module D = Json.Decode;
 
 module Order = {
   type t = {
@@ -119,4 +149,26 @@ module Order = {
     color: Color.t,
     pattern: Pattern.t,
   };
+
+  let encodeJson = (order: t): Js.Json.t => {
+   E.object_([
+   ("orderNumber", E.int(order.orderNumber)),
+   ("quantity", E.int(order.quantity)),
+   ("size", E.string(Size.toString(order.size))),
+   ("sleeve", E.string(Sleeve.toString(order.sleeve))),
+   ("color", E.string(Color.toString(order.color))),
+   ("pattern", E.string(Pattern.toString(order.pattern)))
+   ])
+  };
+    
+  let decodeJson = (json: Js.Json.t): t => {
+    {
+      orderNumber: D.field("orderNumber", D.int, json),
+      quantity: D.field("quantity", D.int, json),
+      size: Size.decodeJson(D.field("size", D.string, json)),
+      sleeve: Sleeve.decodeJson(D.field("sleeve", D.string, json)),
+      color: Color.decodeJson(D.field("color", D.string, json)),
+      pattern: Pattern.decodeJson(D.field("pattern", D.string, json))
+    }
+  }
 };

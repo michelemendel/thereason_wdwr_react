@@ -1,33 +1,55 @@
+open Utils;
+open Belt;
 open OrderFormState;
-module U = OrderFormUtils;
 
-let makeSelect = (label: string, choices: array(string), value: string, changeFcn) => {
+let makeSelect =
+    (label: string, choices: array(string), value: string, changeFn) => {
   let makeOptionElement = (value: string) => {
-    <option key=value value> {ReasonReact.string(value)} </option>;
+    <option key=value value> {rrString(value)} </option>;
   };
 
-  let menuOptionElements = Belt.Array.map(choices, makeOptionElement);
+  let menuOptionElements = Array.map(choices, makeOptionElement);
 
   <span className="item">
-    <label> {ReasonReact.string(" " ++ label ++ ": ")} </label>
-    <select value onChange=changeFcn> {ReasonReact.array(menuOptionElements)} </select>
+    <label> {rrString(" " ++ label ++ ": ")} </label>
+    <select value onChange=changeFn> {rrArray(menuOptionElements)} </select>
   </span>;
 };
 
 let createOrder = (state: state): Shirt.Order.t => {
   {
     orderNumber: state.nextOrderNumber,
-    quantity: U.toIntWithDefault(state.qtyStr, 0),
-    size: U.convertWithDefault(state.sizeStr, Shirt.Size.Medium, Shirt.Size.fromString),
-    sleeve: U.convertWithDefault(state.sleeveStr, Shirt.Sleeve.Long, Shirt.Sleeve.fromString),
-    color: U.convertWithDefault(state.colorStr, Shirt.Color.White, Shirt.Color.fromString),
-    pattern: U.convertWithDefault(state.patternStr, Shirt.Pattern.Solid, Shirt.Pattern.fromString),
+    quantity: toIntWithDefault(state.qtyStr, 0),
+    size:
+      convertWithDefault(
+        state.sizeStr,
+        Shirt.Size.Medium,
+        Shirt.Size.fromString,
+      ),
+    sleeve:
+      convertWithDefault(
+        state.sleeveStr,
+        Shirt.Sleeve.Long,
+        Shirt.Sleeve.fromString,
+      ),
+    color:
+      convertWithDefault(
+        state.colorStr,
+        Shirt.Color.White,
+        Shirt.Color.fromString,
+      ),
+    pattern:
+      convertWithDefault(
+        state.patternStr,
+        Shirt.Pattern.Solid,
+        Shirt.Pattern.fromString,
+      ),
   };
 };
 
 let view = (state, send) => {
   let orderItems =
-    Belt.Array.map(state.orders, order =>
+    Array.map(state.orders, order =>
       <OrderItem
         key={string_of_int(order.orderNumber)}
         order
@@ -36,7 +58,7 @@ let view = (state, send) => {
     );
 
   let orderTable =
-    if (Belt.Array.length(state.orders) > 0) {
+    if (Array.length(state.orders) > 0) {
       <table>
         <thead>
           <tr>
@@ -62,19 +84,37 @@ let view = (state, send) => {
           type_="text"
           size=4
           value={state.qtyStr}
-          onChange={event => send(ChangeQty(ReactEvent.Form.target(event)##value))}
+          onChange={event =>
+            send(ChangeQty(ReactEvent.Form.target(event)##value))
+          }
         />
       </span>
-      {makeSelect("Size", [|"XS", "S", "M", "L", "XL", "XXL", "XXXL"|], state.sizeStr, event =>
+      {makeSelect(
+         "Size",
+         [|"XS", "S", "M", "L", "XL", "XXL", "XXXL"|],
+         state.sizeStr,
+         event =>
          send(ChangeSize(ReactEvent.Form.target(event)##value))
        )}
-      {makeSelect("Sleeve", [|"Short sleeve", "Long sleeve", "Extra-long sleeve"|], state.sleeveStr, event =>
+      {makeSelect(
+         "Sleeve",
+         [|"Short sleeve", "Long sleeve", "Extra-long sleeve"|],
+         state.sleeveStr,
+         event =>
          send(ChangeSleeve(ReactEvent.Form.target(event)##value))
        )}
-      {makeSelect("Color", [|"White", "Blue", "Red", "Green", "Brown"|], state.colorStr, event =>
+      {makeSelect(
+         "Color",
+         [|"White", "Blue", "Red", "Green", "Brown"|],
+         state.colorStr,
+         event =>
          send(ChangeColor(ReactEvent.Form.target(event)##value))
        )}
-      {makeSelect("Pattern", [|"Solid", "Pinstripe", "Checked"|], state.patternStr, event =>
+      {makeSelect(
+         "Pattern",
+         [|"Solid", "Pinstripe", "Checked"|],
+         state.patternStr,
+         event =>
          send(ChangePattern(ReactEvent.Form.target(event)##value))
        )}
       <span className="item">
@@ -83,7 +123,7 @@ let view = (state, send) => {
             let order = createOrder(state);
             send(Enter(order));
           }}>
-          {ReasonReact.string("Add")}
+          {rrString("Add")}
         </button>
       </span>
     </p>
