@@ -7,7 +7,10 @@ const isProd = process.env.NODE_ENV === 'production';
 // const app = "react-test";
 // const app = "notices";
 // const app = "shirt-react";
-const app = "shirt-storage";
+// const app = "shirt-storage";
+// const app = "router-basic";
+// const app = "router-advanced";
+const app = "router-component";
 
 module.exports = {
     entry: "./apps/" + app + "/src/Index.bs.js",

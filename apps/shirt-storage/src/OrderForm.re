@@ -26,7 +26,8 @@ type action =
   | ChangePattern(string)
   | Delete(Shirt.Order.t)
   | Edit(Shirt.Order.t)
-  | MissingData;
+  | MissingData
+  | Tick(string);
 
 let encodeState = (s: state): Js.Json.t => {
   Json.Encode.object_([
@@ -219,6 +220,9 @@ let make = _children => {
         editingNumber: Some(order.orderNumber),
       })
     | MissingData => ReasonReact.Update({...state, errorText: "Please fill in all fields."})
+    | Tick(str) =>
+      Js.log(str);
+      ReasonReact.NoUpdate;
     },
 
   render: self => {
@@ -272,7 +276,12 @@ let make = _children => {
           />
         </span>
         {makeSelect("Size", [|"XS", "S", "M", "L", "XL", "XXL", "XXXL"|], self.state.sizeStr, event =>
-           self.send(ChangeSize(ReactEvent.Form.target(event)##value))
+           /*              Js.log("Setting tick interval every second");
+                           let intervalId = Js.Global.setInterval(() => self.send(Tick("blip")), 1000);
+                           self.onUnmount(() => Js.Global.clearInterval(intervalId)); */
+           self.send(
+             ChangeSize(ReactEvent.Form.target(event)##value),
+           )
          )}
         {makeSelect(
            "Sleeve", [|"Short sleeve", "Long sleeve", "Extra-long sleeve"|], self.state.sleeveStr, event =>
