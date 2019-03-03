@@ -82,15 +82,19 @@ module App = {
     },
 
     reducer: (action, _state) => {
-      Js.log2("basic:reducer:action", action);
+      Js.log2("Basic:reducer:action", action);
       switch (action) {
       | UpdatePage(route) => RR.Update({route: route})
       };
     },
 
     didMount: self => {
+      Js.log("Basic:didMount");
       let watchId =
-        RRR.watchUrl(url => self.send(UpdatePage(Mapper.toPage(url))));
+        RRR.watchUrl(url => {
+          Js.log("Basic:watch");
+          self.send(UpdatePage(Mapper.toPage(url)));
+        });
       self.onUnmount(() => RRR.unwatchUrl(watchId));
     },
 

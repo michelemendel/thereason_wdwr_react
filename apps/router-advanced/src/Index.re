@@ -1,39 +1,20 @@
+/*
+ * Link Behavior
+ * https://accessibility.oit.ncsu.edu/it-accessibility-at-nc-state/developers/accessibility-handbook/mouse-and-keyboard-events/links/link-behavior/
+ *
+ */
+
 module RR = ReasonReact;
 module RRR = RR.Router;
-
-let str = ReasonReact.string;
-let el = ReasonReact.element;
-let arr = ReasonReact.array;
+let str = RR.string;
+let el = RR.element;
+let arr = RR.array;
 
 type page =
   | Dashboard
   | Users
   | User(int);
 
-module type Mapper = {
-  let toPage: RRR.url => page;
-  let toUrl: page => string;
-};
-
-module Mapper: Mapper = {
-  let toPage = (url: RRR.url) => {
-    Js.log2("Mapper:url", url);
-    Js.log2("Mapper:url.path", url.path);
-    Js.log2("Mapper:dangerUrl", RRR.dangerouslyGetInitialUrl());
-
-    switch (url.path) {
-    | ["users"] => Users
-    | ["user", id] => User(int_of_string(id))
-    | _ => Dashboard
-    };
-  };
-  let toUrl = page =>
-    switch (page) {
-    | Users => "users"
-    | User(id) => "user/" ++ string_of_int(id)
-    | _ => "dashboard"
-    };
-};
 module Dashboard = {
   let component = ReasonReact.statelessComponent("Dashboard");
   let make = _children => {
@@ -41,6 +22,7 @@ module Dashboard = {
     render: _self => <div> <h2> {str("Dashboard")} </h2> </div>,
   };
 };
+
 module Users = {
   let component = ReasonReact.statelessComponent("Users");
   let make = _children => {
@@ -58,11 +40,45 @@ module User = {
   };
 };
 
+module type Mapper = {
+  let toPage: RRR.url => page;
+  let toUrl: page => string;
+};
+
+module Mapper: Mapper = {
+  let toPage = (url: RRR.url) => {
+    Js.log("--------Mapper---------");
+    Js.log2("Mapper:url.path", url.path);
+    Js.log2("Mapper:url.hash", url.hash);
+    Js.log2("Mapper:url.search", url.search);
+
+    switch (url.path) {
+    | ["users"] => Users
+    | ["user", id] => User(int_of_string(id))
+    | _ => Dashboard
+    };
+  };
+
+  let toUrl = page =>
+    switch (page) {
+    | Users => "users"
+    | User(id) => "user/" ++ string_of_int(id)
+    | _ => "dashboard"
+    };
+};
+
 module App = {
   type state = {route: page};
 
   type action =
     | UpdatePage(page);
+
+  let navigate = (path, event) => {
+    Js.log("--------NAVIGATE---------");
+    Js.log2("path", path);
+    /* ReactEvent.Mouse.preventDefault(event); */
+    ReasonReact.Router.push(path);
+  };
 
   let component = RR.reducerComponent("App");
 
@@ -70,37 +86,66 @@ module App = {
     ...component,
 
     initialState: () => {
-      route: RRR.dangerouslyGetInitialUrl() |> Mapper.toPage,
+      Js.log("--------INITIALIZE STATE---------");
+      Js.log2("init:route", RRR.dangerouslyGetInitialUrl());
+      {route: Mapper.toPage(RRR.dangerouslyGetInitialUrl())};
     },
 
     reducer: (action, _state) => {
-      Js.log2("advanced:reducer:action", action);
+      Js.log("--------REDUCER---------");
+      Js.log2("reducer:action", action);
       switch (action) {
-      | UpdatePage(route) => RR.Update({route: route})
+      | UpdatePage(route) =>
+        Js.log2("reducer:route", route);
+        RR.Update({route: route});
       };
     },
 
     didMount: self => {
+      Js.log("--------DID MOUNT---------");
       let watchId =
-        RRR.watchUrl(url => self.send(UpdatePage(Mapper.toPage(url))));
+        RRR.watchUrl(url => {
+          Js.log("--------WATCH---------");
+          Js.log2("watch:path", url.path);
+          self.send(UpdatePage(Mapper.toPage(url)));
+        });
       self.onUnmount(() => RRR.unwatchUrl(watchId));
     },
 
-    render: ({state}) =>
+    render: ({state}) => {
       <div>
-        <a href="dashboard"> {str("Dashboard")} </a>
+        <input
+          type_="button"
+          className="button"
+          onClick={navigate("dashboard?hello=world#home")}
+          value="Dashboard"
+        />
         {RR.string(" | ")}
-        <a href="users"> {str("Users")} </a>
+        <input
+          type_="button"
+          className="button"
+          onClick={navigate("users")}
+          value="Users"
+        />
         {RR.string(" | ")}
-        <a href="user/1"> {str("User 1")} </a>
+        <input
+          type_="button"
+          className="button"
+          onClick={navigate("user/19")}
+          value="User 1"
+        />
         {Js.log2("View:route", state.route)
          switch (state.route) {
          | Dashboard => <Dashboard />
          | Users => <Users />
          | User(id) => <User id />
          }}
-      </div>,
+      </div>;
+    },
   };
 };
+
+Js.log("--------START---------");
+Js.log2("url", RRR.dangerouslyGetInitialUrl());
 
 ReactDOMRe.renderToElementWithId(<App />, "root");

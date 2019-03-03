@@ -1,8 +1,8 @@
-let str = ReasonReact.string;
-
-let el = ReasonReact.element;
-
-let arr = ReasonReact.array;
+module RR = ReasonReact;
+module RRR = RR.Router;
+let str = RR.string;
+let el = RR.element;
+let arr = RR.array;
 
 module Dashboard = {
   let component = ReasonReact.statelessComponent("Dashboard");
@@ -48,27 +48,25 @@ module CreateRouter = (Config: Config) => {
   type action =
     | UpdateRoute(route);
 
-  let component = ReasonReact.reducerComponent("Router");
+  let component = RR.reducerComponent("Router");
 
   let make = (~render, _children) => {
     ...component,
 
     initialState: () => {
-      route: ReasonReact.Router.dangerouslyGetInitialUrl() |> Config.toRoute,
+      route: RRR.dangerouslyGetInitialUrl() |> Config.toRoute,
     },
 
     didMount: self => {
       let watchId =
-        ReasonReact.Router.watchUrl(url =>
-          self.send(UpdateRoute(Config.toRoute(url)))
-        );
-      self.onUnmount(() => ReasonReact.Router.unwatchUrl(watchId));
+        RRR.watchUrl(url => self.send(UpdateRoute(Config.toRoute(url))));
+      self.onUnmount(() => RRR.unwatchUrl(watchId));
     },
 
     reducer: (action, _state) => {
-      Js.log2("compnent:advanced:reducer:action", action);
+      Js.log2("compnent:reducer:action", action);
       switch (action) {
-      | UpdateRoute(route) => ReasonReact.Update({route: route})
+      | UpdateRoute(route) => RR.Update({route: route})
       };
     },
 
@@ -87,7 +85,7 @@ type page =
 
 module Config = {
   type route = page;
-  let toRoute = (url: ReasonReact.Router.url) =>
+  let toRoute = (url: RRR.url) =>
     switch (url.path) {
     | ["user", id] => User(int_of_string(id))
     | ["users"] => Users
@@ -110,7 +108,7 @@ module Link = {
     render: _self => {
       let href = toUrl(route);
       let onClick = e => {
-        ReactEventRe.Mouse.preventDefault(e);
+        ReactEvent.Mouse.preventDefault(e);
         ReasonReact.Router.push(href);
       };
       <a href onClick> {render()} </a>;
@@ -124,6 +122,20 @@ module App = {
     ...component,
     render: _self =>
       <div>
+        <Link
+          route=Dashboard
+          toUrl=Config.toUrl
+          render={() => str("Dashboard")}
+        />
+        {RR.string(" | ")}
+        <Link route=Users toUrl=Config.toUrl render={() => str("Users")} />
+        {RR.string(" | ")}
+        <Link
+          route={User(23)}
+          toUrl=Config.toUrl
+          render={() => str("User/1")}
+        />
+        {RR.string(" | ")}
         <Router
           render={({route}) =>
             switch (route) {
@@ -132,12 +144,6 @@ module App = {
             | Users => <Users />
             }
           }
-        />
-        <Link route=Users toUrl=Config.toUrl render={() => str("Users!")} />
-        <Link
-          route=Dashboard
-          toUrl=Config.toUrl
-          render={() => str("Dashboard!")}
         />
       </div>,
   };
