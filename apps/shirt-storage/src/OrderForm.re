@@ -56,8 +56,14 @@ let decodeState = (json: Js.Json.t): state => {
     sleeveStr: Json.Decode.field("sleeveStr", Json.Decode.string, json),
     colorStr: Json.Decode.field("colorStr", Json.Decode.string, json),
     patternStr: Json.Decode.field("patternStr", Json.Decode.string, json),
-    nextOrderNumber: Json.Decode.field("nextOrderNumber", Json.Decode.int, json),
-    orders: Json.Decode.field("orders", Json.Decode.array(Shirt.Order.decodeJson), json),
+    nextOrderNumber:
+      Json.Decode.field("nextOrderNumber", Json.Decode.int, json),
+    orders:
+      Json.Decode.field(
+        "orders",
+        Json.Decode.array(Shirt.Order.decodeJson),
+        json,
+      ),
     errorText: Json.Decode.field("errorText", Json.Decode.string, json),
     editingNumber: {
       let optN = Json.Decode.field("editingNumber", Json.Decode.int, json);
@@ -73,7 +79,11 @@ let localStorageKey = "shirt-orders";
 
 let storeStateLocally = theState => {
   let jsState = encodeState(theState);
-  Dom.Storage.setItem(localStorageKey, Js.Json.stringify(jsState), Dom.Storage.localStorage);
+  Dom.Storage.setItem(
+    localStorageKey,
+    Js.Json.stringify(jsState),
+    Dom.Storage.localStorage,
+  );
 };
 
 let getStoredState = () => {
@@ -88,7 +98,8 @@ let getStoredState = () => {
     errorText: "",
     editingNumber: None,
   };
-  let optItem = Dom.Storage.getItem(localStorageKey, Dom.Storage.localStorage);
+  let optItem =
+    Dom.Storage.getItem(localStorageKey, Dom.Storage.localStorage);
   switch (optItem) {
   | Some(jsonStr) =>
     switch (Js.Json.parseExn(jsonStr)) {
@@ -99,7 +110,8 @@ let getStoredState = () => {
   };
 };
 
-let makeSelect = (label: string, choices: array(string), value: string, changeFcn) => {
+let makeSelect =
+    (label: string, choices: array(string), value: string, changeFcn) => {
   let makeOptionElement = (value: string) => {
     <option key=value value> {ReasonReact.string(value)} </option>;
   };
@@ -111,7 +123,9 @@ let makeSelect = (label: string, choices: array(string), value: string, changeFc
     );
 
   <span className="item">
-    <select value onChange=changeFcn> {ReasonReact.array(menuOptionElements)} </select>
+    <select value onChange=changeFcn>
+      {ReasonReact.array(menuOptionElements)}
+    </select>
   </span>;
 };
 
@@ -123,7 +137,8 @@ let setSize = (order: Shirt.Order.t, newSize: Shirt.Size.t): Shirt.Order.t => {
   {...order, size: newSize};
 };
 
-let setSleeve = (order: Shirt.Order.t, newSleeve: Shirt.Sleeve.t): Shirt.Order.t => {
+let setSleeve =
+    (order: Shirt.Order.t, newSleeve: Shirt.Sleeve.t): Shirt.Order.t => {
   {...order, sleeve: newSleeve};
 };
 
@@ -131,11 +146,13 @@ let setColor = (order: Shirt.Order.t, newColor: Shirt.Color.t): Shirt.Order.t =>
   {...order, color: newColor};
 };
 
-let setPattern = (order: Shirt.Order.t, newPattern: Shirt.Pattern.t): Shirt.Order.t => {
+let setPattern =
+    (order: Shirt.Order.t, newPattern: Shirt.Pattern.t): Shirt.Order.t => {
   {...order, pattern: newPattern};
 };
 
-let map2 = (optA: option('a), optB: option('b), f: ('a, 'b) => 'c): option('c) => {
+let map2 =
+    (optA: option('a), optB: option('b), f: ('a, 'b) => 'c): option('c) => {
   switch (optA, optB) {
   | (Some(a), Some(b)) => Some(f(a, b))
   | (_, _) => None
@@ -168,7 +185,8 @@ let make = _children => {
   initialState: getStoredState,
 
   /* State transitions */
-  reducer: (action, state) =>
+  reducer: (action, state) => {
+    Js.log2("shirt-storage::reducer:action", action);
     switch (action) {
     | Enter(order) =>
       let n = Belt.Option.getWithDefault(toInt(state.qtyStr), 0);
@@ -183,7 +201,10 @@ let make = _children => {
             patternStr: "",
             orders:
               switch (state.editingNumber) {
-              | Some(n) => Belt.Array.map(state.orders, item => item.orderNumber == n ? order : item)
+              | Some(n) =>
+                Belt.Array.map(state.orders, item =>
+                  item.orderNumber == n ? order : item
+                )
               | None => Belt.Array.concat(state.orders, [|order|])
               },
             nextOrderNumber: state.nextOrderNumber + 1,
@@ -196,16 +217,28 @@ let make = _children => {
           },
         );
       } else {
-        ReasonReact.Update({...state, errorText: "Quantity must be between 1 and 100."});
+        ReasonReact.Update({
+          ...state,
+          errorText: "Quantity must be between 1 and 100.",
+        });
       };
     | ChangeQty(newQty) => ReasonReact.Update({...state, qtyStr: newQty})
     | ChangeSize(newSize) => ReasonReact.Update({...state, sizeStr: newSize})
-    | ChangeSleeve(newSleeve) => ReasonReact.Update({...state, sleeveStr: newSleeve})
-    | ChangeColor(newColor) => ReasonReact.Update({...state, colorStr: newColor})
-    | ChangePattern(newPattern) => ReasonReact.Update({...state, patternStr: newPattern})
+    | ChangeSleeve(newSleeve) =>
+      ReasonReact.Update({...state, sleeveStr: newSleeve})
+    | ChangeColor(newColor) =>
+      ReasonReact.Update({...state, colorStr: newColor})
+    | ChangePattern(newPattern) =>
+      ReasonReact.Update({...state, patternStr: newPattern})
     | Delete(order) =>
       ReasonReact.UpdateWithSideEffects(
-        {...state, orders: Belt.Array.keep(state.orders, item => item.orderNumber != order.orderNumber)},
+        {
+          ...state,
+          orders:
+            Belt.Array.keep(state.orders, item =>
+              item.orderNumber != order.orderNumber
+            ),
+        },
         self => storeStateLocally(self.state),
       )
     | Edit(order) =>
@@ -219,11 +252,13 @@ let make = _children => {
         patternStr: Shirt.Pattern.toString(order.pattern),
         editingNumber: Some(order.orderNumber),
       })
-    | MissingData => ReasonReact.Update({...state, errorText: "Please fill in all fields."})
+    | MissingData =>
+      ReasonReact.Update({...state, errorText: "Please fill in all fields."})
     | Tick(str) =>
       Js.log(str);
       ReasonReact.NoUpdate;
-    },
+    };
+  },
 
   render: self => {
     let orderItems =
@@ -272,25 +307,39 @@ let make = _children => {
             type_="text"
             size=4
             value={self.state.qtyStr}
-            onChange={event => self.send(ChangeQty(ReactEvent.Form.target(event)##value))}
+            onChange={event =>
+              self.send(ChangeQty(ReactEvent.Form.target(event)##value))
+            }
           />
         </span>
-        {makeSelect("Size", [|"XS", "S", "M", "L", "XL", "XXL", "XXXL"|], self.state.sizeStr, event =>
+        {makeSelect(
+           "Size",
+           [|"XS", "S", "M", "L", "XL", "XXL", "XXXL"|],
+           self.state.sizeStr,
+           event
            /*              Js.log("Setting tick interval every second");
                            let intervalId = Js.Global.setInterval(() => self.send(Tick("blip")), 1000);
                            self.onUnmount(() => Js.Global.clearInterval(intervalId)); */
-           self.send(
-             ChangeSize(ReactEvent.Form.target(event)##value),
-           )
-         )}
+           => self.send(ChangeSize(ReactEvent.Form.target(event)##value)))}
         {makeSelect(
-           "Sleeve", [|"Short sleeve", "Long sleeve", "Extra-long sleeve"|], self.state.sleeveStr, event =>
+           "Sleeve",
+           [|"Short sleeve", "Long sleeve", "Extra-long sleeve"|],
+           self.state.sleeveStr,
+           event =>
            self.send(ChangeSleeve(ReactEvent.Form.target(event)##value))
          )}
-        {makeSelect("Color", [|"White", "Blue", "Red", "Green", "Brown"|], self.state.colorStr, event =>
+        {makeSelect(
+           "Color",
+           [|"White", "Blue", "Red", "Green", "Brown"|],
+           self.state.colorStr,
+           event =>
            self.send(ChangeColor(ReactEvent.Form.target(event)##value))
          )}
-        {makeSelect("Pattern", [|"Solid", "Pinstripe", "Checked"|], self.state.patternStr, event =>
+        {makeSelect(
+           "Pattern",
+           [|"Solid", "Pinstripe", "Checked"|],
+           self.state.patternStr,
+           event =>
            self.send(ChangePattern(ReactEvent.Form.target(event)##value))
          )}
         <span className="item">
@@ -302,7 +351,9 @@ let make = _children => {
               | None => self.send(MissingData)
               };
             }}>
-            {ReasonReact.string(self.state.editingNumber == None ? "Add" : "Update")}
+            {ReasonReact.string(
+               self.state.editingNumber == None ? "Add" : "Update",
+             )}
           </button>
         </span>
       </p>

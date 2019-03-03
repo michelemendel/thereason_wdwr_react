@@ -6,19 +6,26 @@ let arr = ReasonReact.array;
 
 module Dashboard = {
   let component = ReasonReact.statelessComponent("Dashboard");
-  let make = _children => {...component, render: _self => <div> <h2> {str("Dashboard")} </h2> </div>};
+  let make = _children => {
+    ...component,
+    render: _self => <div> <h2> {str("Dashboard")} </h2> </div>,
+  };
 };
 
 module Users = {
   let component = ReasonReact.statelessComponent("Users");
-  let make = _children => {...component, render: _self => <div> <h2> {str("Users")} </h2> </div>};
+  let make = _children => {
+    ...component,
+    render: _self => <div> <h2> {str("Users")} </h2> </div>,
+  };
 };
 
 module User = {
   let component = ReasonReact.statelessComponent("User");
   let make = (~id, _children) => {
     ...component,
-    render: _self => <div> <h2> {str("User : " ++ string_of_int(id))} </h2> </div>,
+    render: _self =>
+      <div> <h2> {str("User : " ++ string_of_int(id))} </h2> </div>,
   };
 };
 
@@ -46,20 +53,30 @@ module CreateRouter = (Config: Config) => {
   let make = (~render, _children) => {
     ...component,
 
-    initialState: () => {route: ReasonReact.Router.dangerouslyGetInitialUrl() |> Config.toRoute},
+    initialState: () => {
+      route: ReasonReact.Router.dangerouslyGetInitialUrl() |> Config.toRoute,
+    },
 
     didMount: self => {
-      let watchId = ReasonReact.Router.watchUrl(url => self.send(UpdateRoute(Config.toRoute(url))));
+      let watchId =
+        ReasonReact.Router.watchUrl(url =>
+          self.send(UpdateRoute(Config.toRoute(url)))
+        );
       self.onUnmount(() => ReasonReact.Router.unwatchUrl(watchId));
     },
 
-    reducer: (action, _state) =>
+    reducer: (action, _state) => {
+      Js.log2("compnent:advanced:reducer:action", action);
       switch (action) {
       | UpdateRoute(route) => ReasonReact.Update({route: route})
-      },
+      };
+    },
 
     render: self =>
-      render({updateRoute: route => self.send(UpdateRoute(route)), route: self.state.route}),
+      render({
+        updateRoute: route => self.send(UpdateRoute(route)),
+        route: self.state.route,
+      }),
   };
 };
 
@@ -117,7 +134,11 @@ module App = {
           }
         />
         <Link route=Users toUrl=Config.toUrl render={() => str("Users!")} />
-        <Link route=Dashboard toUrl=Config.toUrl render={() => str("Dashboard!")} />
+        <Link
+          route=Dashboard
+          toUrl=Config.toUrl
+          render={() => str("Dashboard!")}
+        />
       </div>,
   };
 };

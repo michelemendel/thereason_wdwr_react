@@ -1,7 +1,8 @@
 open Utils;
 open Belt;
 
-let reducer = (action, state: OrderFormState.state) =>
+let reducer = (action, state: OrderFormState.state) => {
+  Js.log2("shirt-react:reducer:action", action);
   switch (action) {
   | OrderFormState.Enter(order) =>
     let n = toIntWithDefault(state.qtyStr, 0);
@@ -29,3 +30,4 @@ let reducer = (action, state: OrderFormState.state) =>
         ),
     })
   };
+};

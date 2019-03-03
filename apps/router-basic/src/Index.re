@@ -40,7 +40,10 @@ module Mapper: Mapper = {
 
 module Dashboard = {
   let component = RR.statelessComponent("Dashboard");
-  let make = _children => {...component, render: _self => <div> <h2> {str("Dashboard")} </h2> </div>};
+  let make = _children => {
+    ...component,
+    render: _self => <div> <h2> {str("Dashboard")} </h2> </div>,
+  };
 };
 
 module Users = {
@@ -55,7 +58,9 @@ module Users = {
 
       <div>
         <h2> {str("Users")} </h2>
-        <div> <button onClick=gotoDB> {RR.string("Go to Dashboard")} </button> </div>
+        <div>
+          <button onClick=gotoDB> {RR.string("Go to Dashboard")} </button>
+        </div>
       </div>;
     },
   };
@@ -76,13 +81,16 @@ module App = {
       {route: RRR.dangerouslyGetInitialUrl() |> Mapper.toPage};
     },
 
-    reducer: (action, _state) =>
+    reducer: (action, _state) => {
+      Js.log2("basic:reducer:action", action);
       switch (action) {
       | UpdatePage(route) => RR.Update({route: route})
-      },
+      };
+    },
 
     didMount: self => {
-      let watchId = RRR.watchUrl(url => self.send(UpdatePage(Mapper.toPage(url))));
+      let watchId =
+        RRR.watchUrl(url => self.send(UpdatePage(Mapper.toPage(url))));
       self.onUnmount(() => RRR.unwatchUrl(watchId));
     },
 
