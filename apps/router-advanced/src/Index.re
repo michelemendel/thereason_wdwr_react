@@ -47,14 +47,18 @@ module type Mapper = {
 
 module Mapper: Mapper = {
   let toPage = (url: RRR.url) => {
+    let urlHash =
+      Js.String.split("/", url.hash)->Belt.Array.keep(it => it != "");
+
     Js.log("--------Mapper---------");
     Js.log2("Mapper:url.path", url.path);
-    Js.log2("Mapper:url.hash", url.hash);
-    Js.log2("Mapper:url.search", url.search);
+    Js.log2("Mapper:url.path", url.path);
+    Js.log2("Mapper:url.hash:split", urlHash);
+    /* Js.log2("Mapper:url.search", url.search); */
 
-    switch (url.path) {
-    | ["users"] => Users
-    | ["user", id] => User(int_of_string(id))
+    switch (urlHash) {
+    | [|"users"|] => Users
+    | [|"user", id|] => User(int_of_string(id))
     | _ => Dashboard
     };
   };
@@ -73,7 +77,7 @@ module App = {
   type action =
     | UpdatePage(page);
 
-  let navigate = (path, event) => {
+  let navigate = (path, _event) => {
     Js.log("--------NAVIGATE---------");
     Js.log2("path", path);
     /* ReactEvent.Mouse.preventDefault(event); */
@@ -117,21 +121,21 @@ module App = {
         <input
           type_="button"
           className="button"
-          onClick={navigate("dashboard?hello=world#home")}
+          onClick={navigate("/#/dashboard?hello=world#home/")}
           value="Dashboard"
         />
         {RR.string(" | ")}
         <input
           type_="button"
           className="button"
-          onClick={navigate("users")}
+          onClick={navigate("/#/users/")}
           value="Users"
         />
         {RR.string(" | ")}
         <input
           type_="button"
           className="button"
-          onClick={navigate("user/19")}
+          onClick={navigate("/#/user/19/")}
           value="User 1"
         />
         {Js.log2("View:route", state.route)
