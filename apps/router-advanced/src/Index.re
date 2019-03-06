@@ -13,7 +13,7 @@ let arr = RR.array;
 type page =
   | Dashboard
   | Users
-  | User(int);
+  | User(string);
 
 module Dashboard = {
   let component = ReasonReact.statelessComponent("Dashboard");
@@ -33,10 +33,9 @@ module Users = {
 
 module User = {
   let component = ReasonReact.statelessComponent("User");
-  let make = (~id, _children) => {
+  let make = (~id: string, _children) => {
     ...component,
-    render: _self =>
-      <div> <h2> {str("User : " ++ string_of_int(id))} </h2> </div>,
+    render: _self => <div> <h2> {str("User : " ++ id)} </h2> </div>,
   };
 };
 
@@ -58,7 +57,7 @@ module Mapper: Mapper = {
 
     switch (urlHash) {
     | [|"users"|] => Users
-    | [|"user", id|] => User(int_of_string(id))
+    | [|"user", id|] => User(id)
     | _ => Dashboard
     };
   };
@@ -66,7 +65,7 @@ module Mapper: Mapper = {
   let toUrl = page =>
     switch (page) {
     | Users => "users"
-    | User(id) => "user/" ++ string_of_int(id)
+    | User(id) => "user/" ++ id
     | _ => "dashboard"
     };
 };

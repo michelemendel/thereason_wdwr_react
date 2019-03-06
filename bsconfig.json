@@ -1,7 +1,7 @@
 {
     "name": "react-template",
     "sources": {
-        "dir": "apps/router-advanced",
+        "dir": "apps/router-component",
         "subdirs": true
     },
     "package-specs": [{

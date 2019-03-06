@@ -12,8 +12,8 @@ console.log("outputDir", outputDir)
 // const app = "shirt-react";
 // const app = "shirt-storage";
 // const app = "router-basic";
-const app = "router-advanced";
-// const app = "router-component";
+// const app = "router-advanced";
+const app = "router-component";
 
 module.exports = {
     entry: "./apps/" + app + "/src/Index.bs.js",
